@@ -14,7 +14,6 @@ import (
 )
 
 func GetDataDir() string {
-
 	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
