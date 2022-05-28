@@ -19,14 +19,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
+	"polym1/polym1/install"
 	"strings"
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Println("Welcome to PolyM1!")
+		os.Exit(0)
+	}
+
 	oldCmd := os.Args[1:]
+
+	if oldCmd[0] == "install" {
+		install.Install()
+		return
+	}
 
 	classPathIdx := -1
 	originalClassPath := ""
@@ -50,11 +64,28 @@ func main() {
 		log.Fatal("Couldn't find natives dir option!")
 	}
 
-	newClassPath := strings.ReplaceAll(originalClassPath, "abc", "DEF")
+	newClassPath := make([]string, 0)
+	err := filepath.Walk(path.Join(install.GetDataDir(), "files-main", "libraries"), func(path string, info os.FileInfo, err error) error {
+		if strings.HasSuffix(path, ".jar") {
+			newClassPath = append(newClassPath, path)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, val := range strings.Split(originalClassPath, ":") {
+		if !strings.Contains(val, "lwjgl") && !strings.Contains(val, "java-objc-bridge") {
+			newClassPath = append(newClassPath, val)
+		}
+	}
 
 	newCmd := oldCmd[:]
-	newCmd[nativesDirIdx] = "-Djava.library.path="
-	newCmd[classPathIdx] = newClassPath
+	newCmd[nativesDirIdx] = "-Djava.library.path=" + path.Join(install.GetDataDir(), "files-main", "natives")
+	newCmd[classPathIdx] = strings.Join(newClassPath, ":")
 
 	finalExec := exec.Command(newCmd[0], newCmd[1:]...)
 
@@ -63,7 +94,7 @@ func main() {
 	finalExec.Stdout = os.Stdout
 	finalExec.Stderr = os.Stderr
 
-	err := finalExec.Run()
+	err = finalExec.Run()
 
 	if err != nil {
 		log.Fatal(err)
