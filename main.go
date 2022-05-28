@@ -42,6 +42,8 @@ func main() {
 		return
 	}
 
+	fmt.Println("\n=====\n[polym1] original command:", oldCmd)
+
 	classPathIdx := -1
 	originalClassPath := ""
 	nativesDirIdx := -1
@@ -58,16 +60,26 @@ func main() {
 	}
 
 	if classPathIdx == -1 {
-		log.Fatal("No classpath found!")
+		log.Fatal("[polym1] no classpath found!")
 	}
 	if nativesDirIdx == -1 {
-		log.Fatal("Couldn't find natives dir option!")
+		log.Fatal("[polym1] couldn't find natives dir option!")
 	}
 
 	newClassPath := make([]string, 0)
+
+	for _, val := range strings.Split(originalClassPath, ":") {
+		if !strings.Contains(val, "lwjgl") && !strings.Contains(val, "java-objc-bridge") {
+			newClassPath = append(newClassPath, val)
+		} else {
+			fmt.Println("[polym1] removed library", val)
+		}
+	}
+
 	err := filepath.Walk(path.Join(install.GetDataDir(), "files-main", "libraries"), func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".jar") {
 			newClassPath = append(newClassPath, path)
+			fmt.Println("[polym1] added library", path)
 		}
 
 		return nil
@@ -77,20 +89,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, val := range strings.Split(originalClassPath, ":") {
-		if !strings.Contains(val, "lwjgl") && !strings.Contains(val, "java-objc-bridge") {
-			newClassPath = append(newClassPath, val)
-		}
-	}
-
 	newCmd := oldCmd[:]
 	newCmd[nativesDirIdx] = "-Djava.library.path=" + path.Join(install.GetDataDir(), "files-main", "natives")
 	newCmd[classPathIdx] = strings.Join(newClassPath, ":")
 
+	fmt.Println("\n=====\n[polym1] patched command:", newCmd)
+
 	finalExec := exec.Command(newCmd[0], newCmd[1:]...)
 
-	// make the subprocess mostly passthrough
-	finalExec.Stdin = nil
+	// make the subprocess fully passthrough
+	finalExec.Stdin = os.Stdin
 	finalExec.Stdout = os.Stdout
 	finalExec.Stderr = os.Stderr
 
