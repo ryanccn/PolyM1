@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Copy(src, dst string) error {
+func copy(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err

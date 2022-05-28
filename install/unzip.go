@@ -2,7 +2,6 @@ package install
 
 import (
 	"archive/zip"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,7 +9,7 @@ import (
 	"strings"
 )
 
-func Unzip(src string, dst string) {
+func unzip(src string, dst string) {
 	archive, err := zip.OpenReader(src)
 	if err != nil {
 		log.Fatal(err)
@@ -19,7 +18,6 @@ func Unzip(src string, dst string) {
 
 	for _, f := range archive.File {
 		filePath := filepath.Join(dst, f.Name)
-		fmt.Println("unzipping file ", filePath)
 
 		if !strings.HasPrefix(filePath, filepath.Clean(dst)+string(os.PathSeparator)) {
 			log.Fatal("invalid file path")

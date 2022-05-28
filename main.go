@@ -31,7 +31,6 @@ import (
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Println("Welcome to PolyM1!")
 		os.Exit(0)
 	}
 
