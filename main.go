@@ -25,8 +25,9 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"polym1/polym1/install"
 	"strings"
+
+	"github.com/polym1/polym1/install"
 )
 
 func main() {
