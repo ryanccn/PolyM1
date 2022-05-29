@@ -42,8 +42,6 @@ func main() {
 		return
 	}
 
-	fmt.Println("\n=====\n[polym1] original command:", oldCmd)
-
 	classPathIdx := -1
 	originalClassPath := ""
 	nativesDirIdx := -1
@@ -76,7 +74,7 @@ func main() {
 		}
 	}
 
-	err := filepath.Walk(path.Join(install.GetDataDir(), "files-main", "libraries"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(path.Join(install.GetDataDir(), "libraries"), func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".jar") {
 			newClassPath = append(newClassPath, path)
 			fmt.Println("[polym1] added library", path)
@@ -90,10 +88,10 @@ func main() {
 	}
 
 	newCmd := oldCmd[:]
-	newCmd[nativesDirIdx] = "-Djava.library.path=" + path.Join(install.GetDataDir(), "files-main", "natives")
+	newCmd[nativesDirIdx] = "-Djava.library.path=" + path.Join(install.GetDataDir(), "natives")
 	newCmd[classPathIdx] = strings.Join(newClassPath, ":")
 
-	fmt.Println("\n=====\n[polym1] patched command:", newCmd)
+	fmt.Println("[polym1] patched command:", newCmd)
 
 	finalExec := exec.Command(newCmd[0], newCmd[1:]...)
 
