@@ -10,7 +10,7 @@ if [[ $platform != "Darwin" || $processor != "arm" ]]; then
   exit 1
 fi
 
-download_url="https://github.com/PolyM1/PolyM1/releases/latest/download/polym1"
+download_url="https://github.com/ryanccn/PolyM1/releases/latest/download/polym1"
 download_dir="$(mktemp -d)"
 download_path="${download_dir}/polym1"
 
