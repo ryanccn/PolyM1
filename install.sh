@@ -11,8 +11,11 @@ if [[ $platform != "Darwin" || $processor != "arm" ]]; then
 fi
 
 download_url="https://github.com/ryanccn/PolyM1/releases/latest/download/polym1"
-download_dir="$(mktemp -d)"
+download_dir="${HOME}/.polym1"
 download_path="${download_dir}/polym1"
+
+if [ -d "$download_dir" ]; then rm -rf "$download_dir"; fi
+mkdir "$download_dir"
 
 echo "downloading..."
 
