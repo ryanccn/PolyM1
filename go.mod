@@ -1,4 +1,4 @@
-module github.com/polym1/polym1
+module github.com/ryanccn/PolyM1
 
 go 1.18
 
