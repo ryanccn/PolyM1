@@ -5,7 +5,7 @@ PolyM1 is an **M1 hack** for [PolyMC](https://polymc.org/). It also works with s
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/PolyM1/PolyM1/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ryanccn/PolyM1/main/install.sh | sh
 ```
 
 It will download the native libraries for M1. Follow the instructions to configure the wrapper command, and have fun!
