@@ -114,6 +114,10 @@ func main() {
 	finalExec.Stdout = os.Stdout
 	finalExec.Stderr = os.Stderr
 
+	if isEnv {
+		finalExec.Env = append(os.Environ(), "CLASSPATH="+strings.Join(newClassPath, ":"))
+	}
+
 	err = finalExec.Run()
 
 	if err != nil {
