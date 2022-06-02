@@ -44,6 +44,12 @@ func main() {
 
 	envClassPath, isEnv := os.LookupEnv("CLASSPATH")
 
+	if isEnv {
+		fmt.Println("[polym1] using classpath from environment variable")
+	} else {
+		fmt.Println("[polym1] using classpath from option -cp")
+	}
+
 	classPathIdx := -1
 	originalClassPath := ""
 	nativesDirIdx := -1
@@ -95,7 +101,9 @@ func main() {
 
 	newCmd := oldCmd[:]
 	newCmd[nativesDirIdx] = "-Djava.library.path=" + path.Join(install.GetDataDir(), "natives")
-	newCmd[classPathIdx] = strings.Join(newClassPath, ":")
+	if !isEnv {
+		newCmd[classPathIdx] = strings.Join(newClassPath, ":")
+	}
 
 	fmt.Println("[polym1] patched command:", newCmd)
 
