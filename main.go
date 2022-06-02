@@ -42,6 +42,8 @@ func main() {
 		return
 	}
 
+	envClassPath, isEnv := os.LookupEnv("CLASSPATH")
+
 	classPathIdx := -1
 	originalClassPath := ""
 	nativesDirIdx := -1
@@ -57,7 +59,7 @@ func main() {
 		}
 	}
 
-	if classPathIdx == -1 {
+	if classPathIdx == -1 && !isEnv {
 		log.Fatal("[polym1] no classpath found!")
 	}
 	if nativesDirIdx == -1 {
@@ -65,8 +67,12 @@ func main() {
 	}
 
 	newClassPath := make([]string, 0)
+	oldClassPath := originalClassPath
+	if isEnv {
+		oldClassPath = envClassPath
+	}
 
-	for _, val := range strings.Split(originalClassPath, ":") {
+	for _, val := range strings.Split(oldClassPath, ":") {
 		if !strings.Contains(val, "lwjgl") && !strings.Contains(val, "java-objc-bridge") {
 			newClassPath = append(newClassPath, val)
 		} else {
