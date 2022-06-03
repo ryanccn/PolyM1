@@ -35,7 +35,7 @@ func download(dest string, src string, desc string) string {
 	return grabRes.Filename
 }
 
-var META_URLS = []string{"https://repo1.maven.org/maven2/ca/weblite/java-objc-bridge/maven-metadata.xml", "https://repo1.maven.org/maven2/org/lwjgl/lwjgl/maven-metadata.xml"}
+var JAVA_OBJC_BRIDGE_META = "https://repo1.maven.org/maven2/ca/weblite/java-objc-bridge/maven-metadata.xml"
 var LWJGL_LIBS = []string{"lwjgl", "lwjgl-glfw", "lwjgl-jemalloc", "lwjgl-tinyfd", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal"}
 
 // heavily inspired by https://github.com/Dreamail/M1MC/blob/master/main.go
@@ -66,11 +66,10 @@ func DownloadFiles() {
 		}
 	}
 
-	lwjglVersion := ""
 	objcBridgeVersion := ""
 
-	for _, v := range META_URLS {
-		resp, err := http.Get(v)
+	{
+		resp, err := http.Get(JAVA_OBJC_BRIDGE_META)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -86,33 +85,29 @@ func DownloadFiles() {
 		versionOutdex := strings.Index(xmlstr, "</latest>")
 
 		version := string([]rune(xmlstr)[versionIndex:versionOutdex])
-		if strings.Contains(v, "lwjgl") {
-			lwjglVersion = version
-		} else {
-			objcBridgeVersion = version
-		}
+		objcBridgeVersion = version
 	}
 
-	for _, v := range LWJGL_LIBS { // process lwjgl
-		jarUrl := "https://repo1.maven.org/maven2/org/lwjgl/" + v + "/" + lwjglVersion + "/" + v + "-" + lwjglVersion + ".jar"
-		nativeUrl := "https://repo1.maven.org/maven2/org/lwjgl/" + v + "/" + lwjglVersion + "/" + v + "-" + lwjglVersion + "-natives-macos-arm64.jar"
+	for _, v := range LWJGL_LIBS {
+		jarUrl := "https://github.com/MinecraftMachina/lwjgl3/releases/latest/download/" + v + ".jar"
+		nativeUrl := "https://github.com/MinecraftMachina/lwjgl3/releases/latest/download/" + v + "-natives-macos-arm64.jar"
 
 		wg.Add(1)
-		go func() {
+		go func(libName string) {
 			defer wg.Done()
 
-			download(path.Join(dataDir, "libraries"), jarUrl, v)
+			download(path.Join(dataDir, "libraries"), jarUrl, libName)
 
 			if err != nil {
 				log.Fatal(err)
 			}
-		}()
+		}(v)
 
 		wg.Add(1)
-		go func(v string) {
+		go func(libName string) {
 			defer wg.Done()
 
-			downloadFile := download(tmpDir, nativeUrl, v+"-natives")
+			downloadFile := download(tmpDir, nativeUrl, libName+"-natives")
 
 			jarZip, err := zip.OpenReader(downloadFile)
 			if err != nil {
