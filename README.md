@@ -14,4 +14,4 @@ You can rerun the command above any time to update `polym1` or the native librar
 
 ## License
 
-GPL
+GPLv3
